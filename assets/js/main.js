@@ -38,6 +38,17 @@ document.addEventListener("alpine:init", () => {
             }
         },
 
+        platformLabel() {
+            return this.data.platform === "tiktok" ? "TikTok" : "Instagram";
+        },
+
+        step3Subhead() {
+            const n = this.calculateConversionsRequired();
+            const offerWord = n === 1 ? "offer" : "offers";
+            const username = this.data.username || "your account";
+            return `Finish ${n} ${offerWord} to unlock followers for @${username} on ${this.platformLabel()}.`;
+        },
+
         async setSession() {
             this.loading = true
             this.errors = []
