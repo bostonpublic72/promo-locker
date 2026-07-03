@@ -6,6 +6,7 @@
  * If it has, then we need to update the session.
  * */
 
+require_once "../bootstrap.php";
 require_once "../services/ServerService.php";
 require_once "../services/ValidationService.php";
 require_once "../services/DotEnvService.php";

@@ -71,7 +71,7 @@ document.addEventListener("alpine:init", () => {
     })
 });
 document.addEventListener("DOMContentLoaded", () => {
-    const recheckTime = 60000
+    const recheckTime = 10000
 
     async function isComplete() {
         const resp = await fetch("./api/status.php")

@@ -1,4 +1,5 @@
 <?php
+require_once "../bootstrap.php";
 require_once "../services/ServerService.php";
 require_once "../services/DotEnvService.php";
 require_once "../services/ValidationService.php";

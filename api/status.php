@@ -5,6 +5,7 @@
  * This is done by checking if X amount of offers are completed for X amount of followers.
  * */
 
+require_once "../bootstrap.php";
 require_once "../services/ServerService.php";
 require_once "../services/ValidationService.php";
 require_once "../services/ConversionService.php";
@@ -32,10 +33,8 @@ if (!$current_session) {
 $conversions_required = ConversionService::followersToConversions($current_session["followers"]);
 
 $click = new Click();
-$clicks = $click->getAll($current_session["id"]);
 
-// We are completed the required numbers of offers
-if (count($clicks) >= $conversions_required) {
+if ($session->isFulfilled($current_session) || $click->countDistinctCompleted((int)$current_session["id"]) >= $conversions_required) {
     echo json_encode([
         "success" => true
     ]);

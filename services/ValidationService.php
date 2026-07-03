@@ -61,7 +61,7 @@ class ValidationService
      * Check the follower amount provided, and validate that it is a correct amount.
      * This is to prevent someone from manipulating the amount they receive on the frontend.
      * */
-    public static function followers()
+    public static function followers(): int
     {
         switch ($_GET["followers"] ?? null) {
             case "250":
@@ -71,12 +71,42 @@ class ValidationService
             case "1000":
                 return 1000;
             default:
-                // Invalid value was provided so throw an error
                 echo json_encode([
                     "success" => false,
                     "error" => "Invalid follower amount provided"
                 ]);
                 die();
         }
+    }
+
+    public static function offerId(): int
+    {
+        $offerId = filter_var($_GET["offer_id"] ?? null, FILTER_VALIDATE_INT);
+        if ($offerId === false || $offerId < 1) {
+            http_response_code(400);
+            echo "Invalid offer_id";
+            die();
+        }
+        return $offerId;
+    }
+
+    public static function offerLink(): string
+    {
+        $link = urldecode($_GET["link"] ?? "");
+        if (!filter_var($link, FILTER_VALIDATE_URL)) {
+            http_response_code(400);
+            echo "Invalid offer link";
+            die();
+        }
+
+        $parsed = parse_url($link);
+        $scheme = strtolower($parsed["scheme"] ?? "");
+        if (!in_array($scheme, ["http", "https"], true) || empty($parsed["host"])) {
+            http_response_code(400);
+            echo "Invalid offer link";
+            die();
+        }
+
+        return $link;
     }
 }

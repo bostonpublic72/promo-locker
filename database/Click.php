@@ -24,6 +24,40 @@ class Click extends DatabaseHandler {
        return $q->fetchAll();
     }
 
+    public function countDistinctCompleted(int $sessionId): int
+    {
+        $q = $this->connect()->prepare("SELECT COUNT(DISTINCT offer_id) FROM clicks WHERE session_id=? AND completed=1");
+        $q->execute([$sessionId]);
+        return (int)$q->fetchColumn();
+    }
+
+    public function isOfferCompleted(int $offerId, int $sessionId): bool
+    {
+        $q = $this->connect()->prepare("SELECT 1 FROM clicks WHERE offer_id=? AND session_id=? AND completed=1 LIMIT 1");
+        $q->execute([$offerId, $sessionId]);
+        return (bool)$q->fetchColumn();
+    }
+
+    public function markCompleted(int $offerId, int $sessionId): void
+    {
+        if ($this->isOfferCompleted($offerId, $sessionId)) {
+            return;
+        }
+
+        $dateTime = (new DateTime())->format("Y-m-d H:i:s");
+
+        $q = $this->connect()->prepare("UPDATE clicks SET completed=1, completed_at=? WHERE offer_id=? AND session_id=?");
+        $q->execute([$dateTime, $offerId, $sessionId]);
+        if ($q->rowCount() > 0) {
+            return;
+        }
+
+        $statement = $this->connect()->prepare(
+            "INSERT INTO clicks (offer_id, session_id, completed, completed_at) VALUES (?, ?, 1, ?)"
+        );
+        $statement->execute([$offerId, $sessionId, $dateTime]);
+    }
+
     public function update(int $completed, DateTime $completedAt, int $offerId, int $sessionId): void
     {
         $dateTime = $completedAt->format("Y-m-d H:i:s");

@@ -4,6 +4,8 @@ require_once "../services/DotEnvService.php";
 
 class DatabaseHandler
 {
+    private static ?PDO $connection = null;
+
     private string $serverName;
     private string $username;
     private string $password;
@@ -21,6 +23,10 @@ class DatabaseHandler
 
     public function connect(): PDO
     {
+        if (self::$connection !== null) {
+            return self::$connection;
+        }
+
         $this->createVars();
 
         $dsn = "mysql:host=".$this->serverName.";charset=".$this->charset.";";
@@ -32,6 +38,7 @@ class DatabaseHandler
         $pdo->query("CREATE DATABASE IF NOT EXISTS $dbname");
         $pdo->query("use $dbname");
 
-        return $pdo;
+        self::$connection = $pdo;
+        return self::$connection;
     }
 }
